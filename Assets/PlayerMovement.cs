@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -15,25 +16,36 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 _velocity;
 
     private float extraHeightCheck = .1f;
+    private InputManager _inputManager;
     
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _boxCollider2D = GetComponent<BoxCollider2D>();
+        _inputManager = GetComponent<InputManager>();
     }
 
     // Update is called once per frame
     void Update()
+    { 
+        if (IsGrounded()) 
+        { 
+          _velocity = new Vector2(_inputManager.InputVelocity.x * speed,  _inputManager.InputVelocity.y *jumpForce);
+        }
+        else
+        {
+            _velocity = _rigidbody2D.velocity;
+        }
+    }
+
+    private void FixedUpdate()
     {
-      _velocity = new Vector2(Input.GetAxis("Horizontal") * speed, _rigidbody2D.velocity.y);
-
-      if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
-      { 
-          _velocity += new Vector2(0, jumpForce);
-      }
-
-      _rigidbody2D.velocity = _velocity;
+        _rigidbody2D.velocity = _velocity;
+        if (_velocity.y > 0)
+        {
+            _inputManager.ResetJump();
+        }
     }
 
     bool IsGrounded()
