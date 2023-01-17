@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
 
     private float extraHeightCheck = .1f;
     private InputManager _inputManager;
+    private AnimationController _animationController;
+    private Transform _spriteTransform;
     
     // Start is called before the first frame update
     void Awake()
@@ -24,6 +26,8 @@ public class PlayerMovement : MonoBehaviour
         _rigidbody2D = GetComponent<Rigidbody2D>();
         _boxCollider2D = GetComponent<BoxCollider2D>();
         _inputManager = GetComponent<InputManager>();
+        _animationController = GetComponent<AnimationController>();
+        _spriteTransform = GetComponentInChildren<Transform>();
     }
 
     // Update is called once per frame
@@ -37,6 +41,11 @@ public class PlayerMovement : MonoBehaviour
         {
             _velocity = _rigidbody2D.velocity;
         }
+        
+        _animationController.SetIsWalking(_velocity.x != 0);
+        _animationController.SetIsJumping(_velocity.y != 0);
+
+        _spriteTransform.localScale = new Vector3(_velocity.x > 0 ? 1 : -1, 1, 1);
     }
 
     private void FixedUpdate()
