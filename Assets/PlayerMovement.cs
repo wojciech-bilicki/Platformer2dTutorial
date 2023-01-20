@@ -8,7 +8,6 @@ public class PlayerMovement : MonoBehaviour
 {
 
     [SerializeField] private float speed = 5;
-    [SerializeField] private float jumpForce = 5;
     [SerializeField] private LayerMask groundLayerMask;
 
     private Rigidbody2D _rigidbody2D;
@@ -19,6 +18,23 @@ public class PlayerMovement : MonoBehaviour
     private InputManager _inputManager;
     private AnimationController _animationController;
     private Transform _spriteTransform;
+
+    //TODO: this could be represented as enum 
+    #region PlayerStates
+    private bool _isGrounded;
+    private bool _isJumping;
+    #endregion
+
+    #region JumpingProperties
+
+    [SerializeField] private float fallingDownMultiplier =2.0f;
+    [SerializeField] private float maxJumpHeight = 2.5f;
+    [SerializeField] private float maxJumpTime = 1.0f;
+
+    private float jumpForce =>  ( maxJumpHeight) / (maxJumpTime / 2f);
+    private float gravity => (-2f * maxJumpHeight) / Mathf.Pow(maxJumpTime / 2f, 2);
+    
+    #endregion
     
     // Start is called before the first frame update
     void Awake()
@@ -32,25 +48,55 @@ public class PlayerMovement : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    { 
-        if (IsGrounded()) 
-        { 
-          _velocity = new Vector2(_inputManager.InputVelocity.x * speed,  _inputManager.InputVelocity.y *jumpForce);
-        }
-        else
+    {
+        HorizontalMovement();
+        _isGrounded = IsGrounded();
+        if (_isGrounded)
         {
-            _velocity = _rigidbody2D.velocity;
+            TryApplyJump();
         }
-        
-        _animationController.SetIsWalking(_velocity.x != 0);
-        _animationController.SetIsJumping(_velocity.y != 0);
+
+        ApplyGravity();
+        _animationController.SetIsWalking(_isGrounded && _velocity.x != 0);
+        _animationController.SetIsJumping(_isJumping);
 
         _spriteTransform.localScale = new Vector3(_velocity.x > 0 ? 1 : -1, 1, 1);
     }
 
+    private void ApplyGravity()
+    {
+        bool isFalling = _velocity.y < 0.0f;
+        float gravityMultiplier = isFalling  ? fallingDownMultiplier : 1f;
+        float jumpForceMultiplier = _inputManager.IsJumpingPressed ? 2f : 1f;
+        _velocity.y += gravity * Time.deltaTime * gravityMultiplier / jumpForceMultiplier;
+        _velocity.y = Mathf.Max(_velocity.y, gravity / 2f);
+    }
+
+
+    private void HorizontalMovement()
+    {
+        float horizontalVelocity =
+            Mathf.MoveTowards(_velocity.x, _inputManager.InputVelocity.x * speed, speed * Time.deltaTime);
+        _velocity.x = horizontalVelocity;
+    }
+    
+    private void TryApplyJump()
+    {
+        _velocity.y = Mathf.Max(_velocity.y, 0);
+        if (_inputManager.InputVelocity.y > 0)
+        {
+            _velocity.y = jumpForce;
+        }
+
+        _isJumping = _velocity.y > 0.0f;
+    }
+
     private void FixedUpdate()
     {
-        _rigidbody2D.velocity = _velocity;
+        Vector2 position = _rigidbody2D.position;
+        Debug.Log(_velocity);
+        position += _velocity * Time.fixedDeltaTime;
+        _rigidbody2D.MovePosition(position);
         if (_velocity.y > 0)
         {
             _inputManager.ResetJump();
