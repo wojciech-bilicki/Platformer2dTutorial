@@ -14,7 +14,7 @@ public class PlayerMovement : MonoBehaviour
     private BoxCollider2D _boxCollider2D;
     private Vector2 _velocity;
 
-    private float extraHeightCheck = .1f;
+    private float _heightCheckDisctance = .1f;
     private InputManager _inputManager;
     private AnimationController _animationController;
     private Transform _spriteTransform;
@@ -105,11 +105,11 @@ public class PlayerMovement : MonoBehaviour
 
     bool IsGrounded()
     {
-        float raycastDistance = _boxCollider2D.bounds.extents.y + extraHeightCheck;
+      
         Vector3 raycastOrigin = _boxCollider2D.bounds.center;
         
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(raycastOrigin, Vector2.down,
-            raycastDistance, groundLayerMask);
+        RaycastHit2D raycastHit2D = Physics2D.BoxCast(raycastOrigin, _boxCollider2D.bounds.size, 0, Vector2.down,
+            _heightCheckDisctance, groundLayerMask);
 
         Color rayColor;
 
@@ -122,7 +122,7 @@ public class PlayerMovement : MonoBehaviour
             rayColor = Color.red;
         }
         
-        Debug.DrawRay(raycastOrigin, Vector3.down *(raycastDistance), rayColor, groundLayerMask);
+        Debug.DrawRay(raycastOrigin, Vector3.down *(_heightCheckDisctance), rayColor, groundLayerMask);
         return raycastHit2D.collider != null;
     }
 }
