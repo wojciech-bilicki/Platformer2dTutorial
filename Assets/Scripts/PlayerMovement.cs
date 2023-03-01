@@ -7,17 +7,19 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
 
+    public float distanceToGround = 0;
     [SerializeField] private float speed = 5;
     [SerializeField] private LayerMask groundLayerMask;
 
     private Rigidbody2D _rigidbody2D;
-    private BoxCollider2D _boxCollider2D;
+    private PolygonCollider2D _polygonCollider2D;
     private Vector2 _velocity;
 
     private float _heightCheckDisctance = .1f;
     private InputManager _inputManager;
     private AnimationController _animationController;
     private Transform _spriteTransform;
+    private Vector3 _platformMovement = Vector3.zero;
 
     //TODO: this could be represented as enum 
     #region PlayerStates
@@ -40,7 +42,7 @@ public class PlayerMovement : MonoBehaviour
     void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _boxCollider2D = GetComponent<BoxCollider2D>();
+        _polygonCollider2D = GetComponent<PolygonCollider2D>();
         _inputManager = GetComponent<InputManager>();
         _animationController = GetComponent<AnimationController>();
         _spriteTransform = GetComponentInChildren<Transform>();
@@ -94,8 +96,12 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         Vector2 position = _rigidbody2D.position;
-        Debug.Log(_velocity);
         position += _velocity * Time.fixedDeltaTime;
+        if (_platformMovement != Vector3.zero)
+        {
+            position.x += _platformMovement.x;
+            _platformMovement = Vector3.zero;
+        } 
         _rigidbody2D.MovePosition(position);
         if (_velocity.y > 0)
         {
@@ -106,9 +112,9 @@ public class PlayerMovement : MonoBehaviour
     bool IsGrounded()
     {
       
-        Vector3 raycastOrigin = _boxCollider2D.bounds.center;
+        Vector3 raycastOrigin = _polygonCollider2D.bounds.center;
         
-        RaycastHit2D raycastHit2D = Physics2D.BoxCast(raycastOrigin, _boxCollider2D.bounds.size, 0, Vector2.down,
+        RaycastHit2D raycastHit2D = Physics2D.BoxCast(raycastOrigin, _polygonCollider2D.bounds.size, 0, Vector2.down,
             _heightCheckDisctance, groundLayerMask);
 
         Color rayColor;
@@ -122,7 +128,24 @@ public class PlayerMovement : MonoBehaviour
             rayColor = Color.red;
         }
         
+        distanceToGround = raycastHit2D.distance;
+        
         Debug.DrawRay(raycastOrigin, Vector3.down *(_heightCheckDisctance), rayColor, groundLayerMask);
         return raycastHit2D.collider != null;
+    }
+
+    public void OnPlayerDeath()
+    {
+        _inputManager.enabled = false;
+        _polygonCollider2D.enabled = false;
+        _velocity.y = jumpForce * 2;
+        _rigidbody2D.constraints = RigidbodyConstraints2D.None;
+        _rigidbody2D.AddTorque(20, ForceMode2D.Impulse);
+
+    }
+
+    public void AdjustMovementWhenOnMovingPlatform(Vector3 deltaPosition)
+    {
+        _platformMovement += deltaPosition;
     }
 }
