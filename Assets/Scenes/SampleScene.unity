@@ -2624,6 +2624,9 @@ GameObject:
   - component: {fileID: 1737017414}
   - component: {fileID: 1737017415}
   - component: {fileID: 1737017416}
+  - component: {fileID: 1737017417}
+  - component: {fileID: 1737017418}
+  - component: {fileID: 1737017419}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -2890,6 +2893,49 @@ PolygonCollider2D:
       - {x: 0.15639484, y: -0.30405664}
       - {x: 0.40596652, y: -0.3005944}
   m_UseDelaunayMesh: 0
+--- !u!114 &1737017417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737017406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_PanelSettings: {fileID: 11400000, guid: 69caea8450e693c4a85f29267dcda87b, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: c4ebb416dcbc6fd4084eb3715c0c5843, type: 3}
+  m_SortingOrder: 0
+--- !u!114 &1737017418
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737017406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 97c58659f27b2e34c9916e53a1e87860, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 10
+--- !u!114 &1737017419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737017406}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 344219646120b66408aaaef5d904c022, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emptyHeartSprite: {fileID: 21300000, guid: b7d3ff121d4daff488b2faf68c225952, type: 3}
+  filledHeartSprite: {fileID: 21300000, guid: 0bd912b3083a2ad4ba28f925232c8d2c, type: 3}
 --- !u!1 &1814655765
 GameObject:
   m_ObjectHideFlags: 3
